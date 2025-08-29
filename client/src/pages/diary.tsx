@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { DiaryEntry, Memo } from "@shared/schema";
@@ -112,28 +112,62 @@ export default function DiaryPage() {
 
   const displayEntries = searchQuery.length > 0 ? searchResults : entries;
 
+  // Real-time date and time state
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatCurrentDateTime = () => {
+    const now = currentTime;
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+      hour12: true,
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+    return now.toLocaleDateString('ko-KR', options);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-blue-50 to-blue-100">
-      {/* Background illustration */}
-      <div className="fixed inset-0 opacity-10 pointer-events-none z-0 bg-background-pattern" />
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 relative overflow-hidden">
+      {/* Cherry Blossom Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-10 left-10 w-4 h-4 bg-pink-200 rounded-full opacity-30 animate-float"></div>
+        <div className="absolute top-32 right-20 w-3 h-3 bg-pink-300 rounded-full opacity-40 animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-64 left-1/4 w-2 h-2 bg-pink-200 rounded-full opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
+        <div className="absolute bottom-40 right-1/3 w-5 h-5 bg-pink-100 rounded-full opacity-30 animate-float" style={{animationDelay: '3s'}}></div>
+        <div className="absolute bottom-80 left-1/2 w-3 h-3 bg-pink-200 rounded-full opacity-25 animate-float" style={{animationDelay: '4s'}}></div>
+      </div>
 
       <div className="relative z-10 min-h-screen">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-md border-b border-border shadow-sm">
+        <header className="bg-white/80 backdrop-blur-md border-b border-pink-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-korean">
+                <h1 className="text-2xl sm:text-3xl font-bold text-pink-800 font-korean">
                   오늘의 일기장
                 </h1>
-                {/* Animated bouncing character */}
-                <div className="animate-bounce-gentle">
-                  <img
-                    src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100"
-                    alt="Bouncing puppy mascot"
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
-                    data-testid="mascot-image"
-                  />
+                {/* Cherry Blossom Animation */}
+                <div className="cherry-blossom-container">
+                  <div className="cherry-blossom">
+                    <div className="petal petal-1"></div>
+                    <div className="petal petal-2"></div>
+                    <div className="petal petal-3"></div>
+                    <div className="petal petal-4"></div>
+                    <div className="petal petal-5"></div>
+                    <div className="center"></div>
+                  </div>
                 </div>
               </div>
               <Button
@@ -196,6 +230,16 @@ export default function DiaryPage() {
 
             {/* Memo Sidebar */}
             <div className="lg:col-span-1">
+              {/* Real-time Date and Time Display */}
+              <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg border border-pink-200 p-4 mb-6 text-center">
+                <div className="text-lg font-medium text-pink-800 font-korean">
+                  {formatCurrentDateTime()}
+                </div>
+                <div className="text-sm text-pink-600 mt-1">
+                  실시간 업데이트
+                </div>
+              </div>
+              
               <MemoSidebar
                 memos={memos}
                 onCreateMemo={handleCreateMemo}

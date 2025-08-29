@@ -40,10 +40,10 @@ export default function DiaryEntryForm({ onSubmit, onCancel, isSubmitting = fals
   };
 
   return (
-    <Card className="bg-card rounded-xl shadow-lg border border-border mb-6">
+    <Card className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-pink-200 mb-6">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-semibold text-card-foreground font-korean">
+          <CardTitle className="text-xl font-semibold text-pink-800 font-korean">
             일기 작성
           </CardTitle>
           <Button

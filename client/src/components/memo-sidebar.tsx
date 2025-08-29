@@ -33,10 +33,10 @@ export default function MemoSidebar({ memos, onCreateMemo, onDeleteMemo, isCreat
   return (
     <div className="memo-sidebar">
       {/* Memo Section */}
-      <Card className="bg-card rounded-xl shadow-lg border border-border">
+      <Card className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-pink-200">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="font-semibold text-card-foreground font-korean">
+            <CardTitle className="font-semibold text-pink-800 font-korean">
               할 일 메모
             </CardTitle>
             <Button
@@ -136,10 +136,10 @@ export default function MemoSidebar({ memos, onCreateMemo, onDeleteMemo, isCreat
       </Card>
 
       {/* Mood Chart */}
-      <Card className="bg-card rounded-xl shadow-lg border border-border mt-6">
+      <Card className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-pink-200 mt-6">
         <CardHeader>
-          <CardTitle className="font-semibold text-card-foreground font-korean">
-            <BarChart3 className="h-4 w-4 mr-2 text-primary inline" />
+          <CardTitle className="font-semibold text-pink-800 font-korean">
+            <BarChart3 className="h-4 w-4 mr-2 text-pink-600 inline" />
             이번 주 감정 분석
           </CardTitle>
         </CardHeader>

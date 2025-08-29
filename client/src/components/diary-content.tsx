@@ -13,7 +13,7 @@ interface DiaryContentProps {
 
 export default function DiaryContent({ entry, onBack, onDelete }: DiaryContentProps) {
   return (
-    <Card className="bg-card rounded-xl shadow-lg border border-border">
+    <Card className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-pink-200">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <Button
@@ -51,22 +51,29 @@ export default function DiaryContent({ entry, onBack, onDelete }: DiaryContentPr
             {entry.emotion}
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-card-foreground font-korean" data-testid="content-title">
+            <h1 className="text-2xl font-bold text-pink-800 font-korean" data-testid="content-title">
               {entry.title}
             </h1>
-            <p className="text-muted-foreground font-korean" data-testid="content-date">
+            <p className="text-pink-600 font-korean" data-testid="content-date">
               {format(new Date(entry.createdAt), "yyyy년 M월 d일 EEEE a h:mm", { locale: ko })}
             </p>
           </div>
         </div>
 
         <div className="prose prose-lg max-w-none">
-          <p
-            className="text-card-foreground leading-relaxed whitespace-pre-wrap font-korean"
+          <div
+            className="text-pink-800 leading-relaxed whitespace-pre-wrap font-korean bg-pink-50/50 p-4 rounded-lg min-h-[200px]"
             data-testid="content-text"
+            style={{
+              wordBreak: 'break-word',
+              lineHeight: '1.7',
+              fontSize: '16px',
+              maxHeight: 'none',
+              overflow: 'visible'
+            }}
           >
             {entry.content}
-          </p>
+          </div>
         </div>
       </CardContent>
     </Card>

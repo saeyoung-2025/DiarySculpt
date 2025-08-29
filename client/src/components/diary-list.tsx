@@ -55,7 +55,7 @@ export default function DiaryList({ entries, onEntryClick, isLoading = false }: 
       {entries.map((entry) => (
         <Card
           key={entry.id}
-          className="bg-card rounded-xl shadow-lg border border-border overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group"
+          className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-pink-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group hover:scale-[1.02]"
           onClick={() => onEntryClick(entry)}
           data-testid={`card-diary-entry-${entry.id}`}
         >
@@ -86,18 +86,24 @@ export default function DiaryList({ entries, onEntryClick, isLoading = false }: 
               </Button>
             </div>
             <h3
-              className="text-lg font-medium text-card-foreground mb-2 group-hover:text-primary transition-colors font-korean"
+              className="text-lg font-medium text-pink-800 mb-2 group-hover:text-pink-600 transition-colors font-korean"
               data-testid={`title-${entry.id}`}
             >
               {entry.title}
             </h3>
             <p
-              className="text-muted-foreground text-sm line-clamp-2 font-korean"
+              className="text-pink-600 text-sm font-korean"
               data-testid={`preview-${entry.id}`}
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                lineHeight: '1.5',
+                maxHeight: '4.5em'
+              }}
             >
-              {entry.content.length > 100
-                ? `${entry.content.substring(0, 100)}...`
-                : entry.content}
+              {entry.content}
             </p>
           </CardContent>
         </Card>
