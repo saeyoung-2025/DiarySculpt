@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 일기장</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    korean: ["Noto Sans KR", "sans-serif"],
+                    sans: ["Inter", "Noto Sans KR", "sans-serif"],
+                },
+                animation: {
+                    'bounce-gentle': 'bounce-gentle 2s infinite',
+                    'float': 'float 3s ease-in-out infinite',
+                }
+            },
+        }
+    };
+    </script>
+    
+    <style>
+        :root {
+            --radius: 12px;
+            --background: hsl(204 100% 97%);
+            --foreground: hsl(213 27% 28%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(213 27% 28%);
+            --primary: hsl(217 91% 60%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(47 96% 89%);
+            --secondary-foreground: hsl(213 27% 28%);
+            --muted: hsl(207 12% 97%);
+            --muted-foreground: hsl(213 19% 46%);
+            --accent: hsl(4 86% 69%);
+            --accent-foreground: hsl(0 0% 100%);
+            --border: hsl(213 27% 84%);
+            --input: hsl(213 27% 84%);
+            --ring: hsl(217 91% 60%);
+        }
+        
+        @keyframes bounce-gentle {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .memo-sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+        
+        .diary-content {
+            display: none;
+        }
+        
+        .diary-content.active {
+            display: block;
+        }
+        
+        .diary-list.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="h-full bg-gradient-to-br from-background via-blue-50 to-blue-100 font-korean">
+    <!-- Soft background illustration - peaceful nature scene -->
+    <!-- A serene watercolor-style landscape with gentle hills and soft clouds -->
+    <div class="fixed inset-0 opacity-10 pointer-events-none z-0" 
+         style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2000&h=1200'); 
+                background-size: cover; 
+                background-position: center; 
+                background-repeat: no-repeat;"></div>
+
+    <div class="relative z-10 min-h-screen">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md border-b border-border shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-foreground">오늘의 일기장</h1>
+                        <!-- Animated bouncing character (Snoopy-like) -->
+                        <!-- A cute animated dog character bouncing playfully -->
+                        <div class="animate-bounce-gentle">
+                            <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" 
+                                 alt="Bouncing puppy mascot" 
+                                 class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" />
+                        </div>
+                    </div>
+                    <button id="newEntryBtn" class="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors">
+                        <i class="fas fa-plus mr-2"></i>새 일기
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Main Content Area -->
+                <div class="lg:col-span-2">
+                    
+                    <!-- Diary Entry Form (Initially Hidden) -->
+                    <div id="entryForm" class="bg-card rounded-xl shadow-lg p-6 mb-6 hidden border border-border">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-semibold text-card-foreground">일기 작성</h2>
+                            <button id="cancelBtn" class="text-muted-foreground hover:text-foreground">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Emotion Selector -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-card-foreground mb-2">오늘의 기분</label>
+                            <div class="flex space-x-2">
+                                <button class="emotion-btn p-3 bg-secondary hover:bg-secondary/80 rounded-lg border border-border transition-colors" data-emotion="😊">😊</button>
+                                <button class="emotion-btn p-3 bg-secondary hover:bg-secondary/80 rounded-lg border border-border transition-colors" data-emotion="😢">😢</button>
+                                <button class="emotion-btn p-3 bg-secondary hover:bg-secondary/80 rounded-lg border border-border transition-colors" data-emotion="😠">😠</button>
+                                <button class="emotion-btn p-3 bg-secondary hover:bg-secondary/80 rounded-lg border border-border transition-colors" data-emotion="😴">😴</button>
+                                <button class="emotion-btn p-3 bg-secondary hover:bg-secondary/80 rounded-lg border border-border transition-colors" data-emotion="🎉">🎉</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Title Input -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-card-foreground mb-2">제목</label>
+                            <input type="text" id="titleInput" placeholder="제목을 입력하세요..." 
+                                   class="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background">
+                        </div>
+                        
+                        <!-- Content Textarea -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-card-foreground mb-2">내용</label>
+                            <textarea id="contentInput" rows="6" placeholder="오늘 있었던 일을 자유롭게 써보세요..." 
+                                      class="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-none bg-background"></textarea>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-3">
+                            <button id="saveBtn" class="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors">저장</button>
+                            <button id="draftBtn" class="bg-secondary hover:bg-secondary/80 text-secondary-foreground px-4 py-2 rounded-lg font-medium transition-colors">임시저장</button>
+                        </div>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="bg-card rounded-xl shadow-lg p-4 mb-6 border border-border">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+                            <input type="text" id="searchInput" placeholder="일기 검색..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background">
+                        </div>
+                    </div>
+
+                    <!-- Diary Entries List -->
+                    <div id="diaryList" class="diary-list space-y-4">
+                        <!-- Sample diary entries -->
+                        <article class="diary-entry bg-card rounded-xl shadow-lg border border-border overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group" 
+                                 data-entry-id="1" data-content="오늘은 정말 좋은 하루였다. 아침에 일찍 일어나서 산책을 했고, 친구들과 만나서 즐거운 시간을 보냈다. 저녁에는 가족과 함께 맛있는 저녁을 먹었다. 이런 평범한 일상이 얼마나 소중한지 새삼 느끼게 된다.">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">😊</span>
+                                        <span class="text-sm text-muted-foreground">2025. 8. 29. 오후 2:36:15</span>
+                                    </div>
+                                    <button class="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-opacity">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <h3 class="text-lg font-medium text-card-foreground mb-2 group-hover:text-primary transition-colors">아름다운 나라: 나라</h3>
+                                <p class="text-muted-foreground text-sm line-clamp-2">오늘은 정말 좋은 하루였다. 아침에 일찍 일어나서...</p>
+                            </div>
+                        </article>
+
+                        <article class="diary-entry bg-card rounded-xl shadow-lg border border-border overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group" 
+                                 data-entry-id="2" data-content="클로드: 정부 어제 그게 들어가지고 숨퍼. 오늘 하루 종일 비가 와서 집에만 있었다. 그래도 좋은 책을 읽으며 차분한 시간을 보낼 수 있어서 괜찮았다. 비 오는 소리를 들으며 창가에 앉아 있으니 마음이 평온해졌다.">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">😢</span>
+                                        <span class="text-sm text-muted-foreground">2025. 8. 29. 오후 2:36:41</span>
+                                    </div>
+                                    <button class="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-opacity">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <h3 class="text-lg font-medium text-card-foreground mb-2 group-hover:text-primary transition-colors">비 오는 날의 생각</h3>
+                                <p class="text-muted-foreground text-sm line-clamp-2">클로드: 정부 어제 그게 들어가지고 숨퍼. 오늘 하루 종일...</p>
+                            </div>
+                        </article>
+
+                        <article class="diary-entry bg-card rounded-xl shadow-lg border border-border overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group" 
+                                 data-entry-id="3" data-content="새로운 취미를 시작했다. 바로 수채화 그리기다. 처음에는 어렵게 느껴졌지만, 점점 재미있어지고 있다. 색깔들이 종이 위에서 번지는 모습이 신기하고 아름답다. 앞으로도 꾸준히 연습해서 멋진 작품을 그려보고 싶다.">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">🎨</span>
+                                        <span class="text-sm text-muted-foreground">2025. 8. 28. 오후 6:22:10</span>
+                                    </div>
+                                    <button class="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-opacity">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                                <h3 class="text-lg font-medium text-card-foreground mb-2 group-hover:text-primary transition-colors">새로운 시작</h3>
+                                <p class="text-muted-foreground text-sm line-clamp-2">새로운 취미를 시작했다. 바로 수채화 그리기다...</p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Diary Content View (Initially Hidden) -->
+                    <div id="diaryContent" class="diary-content bg-card rounded-xl shadow-lg border border-border p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <button id="backBtn" class="flex items-center text-muted-foreground hover:text-foreground transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>목록으로
+                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button class="text-muted-foreground hover:text-foreground transition-colors">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-muted-foreground hover:text-accent transition-colors">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3 mb-4">
+                            <span id="contentEmotion" class="text-3xl">😊</span>
+                            <div>
+                                <h1 id="contentTitle" class="text-2xl font-bold text-card-foreground">일기 제목</h1>
+                                <p id="contentDate" class="text-muted-foreground">2025. 8. 29. 오후 2:36:15</p>
+                            </div>
+                        </div>
+                        
+                        <div class="prose prose-lg max-w-none">
+                            <p id="contentText" class="text-card-foreground leading-relaxed whitespace-pre-wrap">일기 내용이 여기에 표시됩니다...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memo Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="memo-sidebar">
+                        <div class="bg-card rounded-xl shadow-lg border border-border p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-card-foreground">할 일 메모</h3>
+                                <button id="addMemoBtn" class="text-muted-foreground hover:text-foreground transition-colors">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Memo Input -->
+                            <div class="mb-4">
+                                <textarea id="memoInput" placeholder="메모를 입력하세요..." 
+                                          class="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring resize-none bg-background h-20"></textarea>
+                            </div>
+
+                            <!-- Quick Action Buttons -->
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <button class="memo-action-btn bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                                    저장
+                                </button>
+                                <button class="memo-action-btn bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                                    수정
+                                </button>
+                                <button class="memo-action-btn bg-secondary hover:bg-secondary/80 text-secondary-foreground px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                                    삭제
+                                </button>
+                            </div>
+
+                            <!-- Saved Memos -->
+                            <div class="space-y-2">
+                                <div class="memo-item bg-muted rounded-lg p-3 text-sm">
+                                    <p class="text-muted-foreground">내일 친구와 만나기</p>
+                                    <span class="text-xs text-muted-foreground">방금 전</span>
+                                </div>
+                                <div class="memo-item bg-muted rounded-lg p-3 text-sm">
+                                    <p class="text-muted-foreground">책 읽기 - 소설 한 권</p>
+                                    <span class="text-xs text-muted-foreground">1시간 전</span>
+                                </div>
+                                <div class="memo-item bg-muted rounded-lg p-3 text-sm">
+                                    <p class="text-muted-foreground">운동하기 - 30분 조깅</p>
+                                    <span class="text-xs text-muted-foreground">어제</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mood Chart -->
+                        <div class="bg-card rounded-xl shadow-lg border border-border p-4 mt-6">
+                            <h3 class="font-semibold text-card-foreground mb-4">
+                                <i class="fas fa-chart-bar mr-2 text-primary"></i>이번 주 감정 분석
+                            </h3>
+                            <!-- Simple mood visualization -->
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">행복</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-20 bg-muted rounded-full h-2">
+                                            <div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
+                                        </div>
+                                        <span class="text-xs text-muted-foreground">4</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">평온</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-20 bg-muted rounded-full h-2">
+                                            <div class="bg-secondary h-2 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                        <span class="text-xs text-muted-foreground">3</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">우울</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-20 bg-muted rounded-full h-2">
+                                            <div class="bg-accent h-2 rounded-full" style="width: 20%"></div>
+                                        </div>
+                                        <span class="text-xs text-muted-foreground">1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-muted-foreground mt-3">2025. 8. 29. 오후 2:36:54</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TODO: Implement proper state management and API integration
+        (function() {
+            let selectedEmotion = '😊';
+            let currentView = 'list';
+            
+            // DOM Elements
+            const newEntryBtn = document.getElementById('newEntryBtn');
+            const entryForm = document.getElementById('entryForm');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const diaryList = document.getElementById('diaryList');
+            const diaryContent = document.getElementById('diaryContent');
+            const backBtn = document.getElementById('backBtn');
+            const emotionBtns = document.querySelectorAll('.emotion-btn');
+            const diaryEntries = document.querySelectorAll('.diary-entry');
+            const searchInput = document.getElementById('searchInput');
+            const memoInput = document.getElementById('memoInput');
+            const addMemoBtn = document.getElementById('addMemoBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            
+            // Event Listeners
+            newEntryBtn.addEventListener('click', showEntryForm);
+            cancelBtn.addEventListener('click', hideEntryForm);
+            backBtn.addEventListener('click', showDiaryList);
+            
+            // Emotion selection
+            emotionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    emotionBtns.forEach(b => b.classList.remove('ring-2', 'ring-primary'));
+                    this.classList.add('ring-2', 'ring-primary');
+                    selectedEmotion = this.dataset.emotion;
+                });
+            });
+            
+            // Diary entry clicks
+            diaryEntries.forEach(entry => {
+                entry.addEventListener('click', function() {
+                    showDiaryContent(this);
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                diaryEntries.forEach(entry => {
+                    const title = entry.querySelector('h3').textContent.toLowerCase();
+                    const content = entry.dataset.content.toLowerCase();
+                    if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                        entry.style.display = 'block';
+                    } else {
+                        entry.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Memo functionality
+            addMemoBtn.addEventListener('click', function() {
+                if (memoInput.value.trim()) {
+                    // TODO: Add memo to list and save to backend
+                    memoInput.value = '';
+                    console.log('Memo added');
+                }
+            });
+            
+            // Save diary entry
+            saveBtn.addEventListener('click', function() {
+                const title = document.getElementById('titleInput').value;
+                const content = document.getElementById('contentInput').value;
+                
+                if (title.trim() && content.trim()) {
+                    // TODO: Save to backend and update UI
+                    console.log('Diary saved:', { title, content, emotion: selectedEmotion });
+                    hideEntryForm();
+                }
+            });
+            
+            // Functions
+            function showEntryForm() {
+                entryForm.classList.remove('hidden');
+                entryForm.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function hideEntryForm() {
+                entryForm.classList.add('hidden');
+                // Clear form
+                document.getElementById('titleInput').value = '';
+                document.getElementById('contentInput').value = '';
+                emotionBtns.forEach(btn => btn.classList.remove('ring-2', 'ring-primary'));
+                emotionBtns[0].classList.add('ring-2', 'ring-primary');
+                selectedEmotion = '😊';
+            }
+            
+            function showDiaryContent(entryElement) {
+                const entryId = entryElement.dataset.entryId;
+                const content = entryElement.dataset.content;
+                const emotion = entryElement.querySelector('span').textContent;
+                const title = entryElement.querySelector('h3').textContent;
+                const date = entryElement.querySelector('.text-muted-foreground').textContent;
+                
+                // Update content view
+                document.getElementById('contentEmotion').textContent = emotion;
+                document.getElementById('contentTitle').textContent = title;
+                document.getElementById('contentDate').textContent = date;
+                document.getElementById('contentText').textContent = content;
+                
+                // Show content view
+                diaryList.classList.add('hidden');
+                diaryContent.classList.add('active');
+                diaryContent.scrollIntoView({ behavior: 'smooth' });
+                currentView = 'content';
+            }
+            
+            function showDiaryList() {
+                diaryContent.classList.remove('active');
+                diaryList.classList.remove('hidden');
+                currentView = 'list';
+            }
+            
+            // Initialize first emotion button as selected
+            emotionBtns[0].classList.add('ring-2', 'ring-primary');
+        })();
+    </script>
+</body>
+</html>
